@@ -1,0 +1,7 @@
+form.auth-form(onsubmit=locals.$bind("this.submitForm(event.target)", {preventDefault: true}))
+    input(type="text", id="auth-server", onchange=locals.$bind("this.state.server = event.target.value"))
+    input(type="text", id="auth-user", onchange=locals.$bind("this.state.user = event.target.value"))
+    input(type="password", id="auth-password", onchange=locals.$bind("this.state.password = event.target.value"))
+    input(type="checkbox", id="auth-remember", onchange=locals.$bind("this.state.shouldRemember = event.target.value"))
+    label(for="auth-remember") Remember password?
+    input(type="submit") Submit
