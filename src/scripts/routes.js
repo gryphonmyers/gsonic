@@ -2,6 +2,6 @@ module.exports = [
     {
         name: 'home',
         pattern: '/',
-        handler: 'Home'
+        handler: 'Library'
     }
 ];

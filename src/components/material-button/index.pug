@@ -1,0 +1,8 @@
+if locals.type == 'link'
+	a.material-button&attributes(locals.$attributes)
+		span
+			content
+else 
+	button.material-button(type=locals.type)&attributes(locals.$attributes)
+		span
+			content

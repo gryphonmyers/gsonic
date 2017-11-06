@@ -1,3 +1,7 @@
 .my-element {
     background-color: green;
+
+    & .test {
+        background-color: red;
+    }
 }

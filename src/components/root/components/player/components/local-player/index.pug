@@ -1,0 +1,10 @@
+.local-player(id=locals.playerID)
+    audio(controls, 
+        oncanplaythrough=$bind("this.onCanPlayThrough(event)"), 
+        onended=$bind("this.onEnded(event)")
+        ontimeupdate=$bind("this.onTimeUpdate(event)"))
+        each source in locals.sources
+            source(src=source.src, type=source.type)
+
+    if locals.isBuffering
+        span.buffering Buffering...

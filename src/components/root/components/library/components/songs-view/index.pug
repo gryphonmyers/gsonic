@@ -1,0 +1,26 @@
+.songs-view
+    .songs
+        .songs-table
+            ul.songs-header
+                li.header Header
+            ul.songs(style="padding-top: " + locals.topPadding + "px; padding-bottom: " + locals.bottomPadding + 'px;')
+                //- li.filler(style="height: " + locals.topPadding + 'px')
+                each song in songs
+                    if typeof song === 'number'
+                        li.song-item.empty(style="height: " + locals.rowHeight + "px;")= song
+                    else if song.then
+                        li.song-item.loading(style="height: " + locals.rowHeight + "px;") loading...
+                    else
+                        li.song-item(id="song-item-" + song._id, style="height: " + locals.rowHeight + "px;")= song.title
+                //- li.filler(style="height: " + locals.bottomPadding + 'px')
+                //- DataRow(data-song=JSON.stringify(song))
+                //-     DataCol.index(onclick=$bind("this.playSong(event)"))= ii
+                //-     DataCol.title= song.title
+                //-     DataCol.duration= song.duration
+                //-     DataCol.artist= song.artist
+                //-     DataCol.play-count= song.playCount
+                //-     DataCol.rating= song.rating
+        button.prev(onclick=$bind("this.prevPage()")) Previous
+        button.next(onclick=$bind("this.nextPage()")) Next
+    if isLoading
+        .loading Loading...

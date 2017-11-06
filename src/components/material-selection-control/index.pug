@@ -1,0 +1,17 @@
+case locals.type
+	when 'switch'
+		.material-selection-control.switch
+			input(type="checkbox", id=locals.inputID, name="set-name")&attributes(locals.inputAttrs)
+			label(for=locals.inputID) 
+				span= locals.label
+				if locals.onLabel
+					span.toggle--on= locals.onLabel
+				if locals.offLabel
+					span.toggle--off= locals.offLabel
+				.switch
+	when 'checkbox'
+		.checkbox
+			label
+				input(type="checkbox")
+				i.helper
+				|I'm the label from a Checkbox
