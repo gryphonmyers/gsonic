@@ -26,11 +26,13 @@ module.exports = Component => class SongsViewComponent extends Component {
             },
             inputs: ['libraryInterface', 'filter', 'perPage'],
             markupTemplate: require('./index.pug'),
-            styles: require('./index.css'),
             components: {
                 // DataTable: require('../../../../../material-data-table-component')
             }
         }))
+    }
+    static get styles() {
+        return require('./index.css');
     }
 
     playSong(evt) {
@@ -112,42 +114,29 @@ module.exports = Component => class SongsViewComponent extends Component {
     }
 
     onInit() {
-        this.nextRender(() => {
-            // var cursorDelta;
-            var setCursor = (cursor) => {
-                this.state.desiredCursor = cursor;
-            };
-            var setCursorDebounced = debounce(setCursor, 300);
-            var onScroll = function () {
-                var top = document.querySelector('.songs-table .songs').getBoundingClientRect().top;
-                // var offset = window.pageYOffset;
-                // cursorDelta = this.state.cursor - Math.floor(-top / 20);
-                var targetCursor = Math.floor(-top / 20);
-                var loadedSongs = this.state.loadedSongs;
-                if (Array.from({length: this.state.perPage}, (val, ii) => targetCursor + ii).every(index => loadedSongs[index])) {
-                    setCursorDebounced.clear();
-                    setCursor(targetCursor);
-                } else {
-                    setCursorDebounced(targetCursor);
-                }
-            }.bind(this);
+        this.awaitRender()
+            .then(() => {
+                // var cursorDelta;
+                var setCursor = (cursor) => {
+                    this.state.desiredCursor = cursor;
+                };
+                var setCursorDebounced = debounce(setCursor, 300);
+                var onScroll = function () {
+                    var top = document.querySelector('.songs-table .songs').getBoundingClientRect().top;
+                    // var offset = window.pageYOffset;
+                    // cursorDelta = this.state.cursor - Math.floor(-top / 20);
+                    var targetCursor = Math.floor(-top / 20);
+                    var loadedSongs = this.state.loadedSongs;
+                    if (Array.from({length: this.state.perPage}, (val, ii) => targetCursor + ii).every(index => loadedSongs[index])) {
+                        setCursorDebounced.clear();
+                        setCursor(targetCursor);
+                    } else {
+                        setCursorDebounced(targetCursor);
+                    }
+                }.bind(this);
 
-            // var debounced = debounce(onScroll, 300);
-            // this.state.watch('cursor', cursor => {
-            //     window.removeEventListener('scroll', debounced);
-            //     this.nextRender(() => {
-            //         var top = document.querySelector('.songs-table').getBoundingClientRect().top;
-            //         var cursorDelta = cursor - Math.floor(-top / 20);
-            //         if (cursorDelta < 0) {
-            //             window.scrollBy(0, cursorDelta * this.state.rowHeight);
-            //         }
-            //         window.addEventListener('scroll', debounced)
-            //     });
-            // });
-
-
-            window.addEventListener('scroll', onScroll);
-        })
+                window.addEventListener('scroll', onScroll);
+            })
 
         this.state.watch('songs', (songs) => {
             this.fetchMissingSongs(songs)

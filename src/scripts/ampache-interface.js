@@ -33,7 +33,13 @@ class AmpacheInterface extends MusicLibraryInterface {
                         })
                 },
                 auth: function(json){
-                    return json.auth[0] || Promise.reject('no token in payload');
+                    return json.auth[0] || Promise.reject(json);
+                },
+                ping: function(json) {
+                    if (json.version[0]) {
+                        return json;
+                    }
+                    return Promise.reject(json);
                 },
                 songs: function(data) {
                     var songs = data.song.map(obj => new Song({
@@ -67,8 +73,20 @@ class AmpacheInterface extends MusicLibraryInterface {
         return super.auth({timestamp, user, auth, action: 'handshake'});
     }
 
+    ping() {
+        return super.ping({
+            auth: this.token,
+            action: 'ping'
+        })
+    }
+
     songs(args) {
-        return super.songs(Object.assign({auth: this.token, action: 'songs', limit: args.limit || '50', offset: args.offset || '0'}, args || {}));
+        return super.songs(Object.assign({
+            auth: this.token,
+            action: 'songs',
+            limit: args.limit || '50',
+            offset: args.offset || '0'
+        }, args || {}));
     }
 }
 

@@ -7,7 +7,6 @@ module.exports = Component => class RootComponent extends Component {
                 libraryInterface: null
             },
             markupTemplate: require('./index.pug'),
-            styles: require('./index.css'),
             components: {
                 Library: [require('./components/library'), {libraryInterface: 'libraryInterface'}],
                 AuthForm: require('./components/auth-form'),
@@ -16,15 +15,26 @@ module.exports = Component => class RootComponent extends Component {
         }))
     }
 
+    static get styles() {
+        return require('./index.css');
+    }
+
     onInit() {
         var libraryInterface = localStorage.getItem('libraryInterface');
         if (libraryInterface) {
             libraryInterface = JSON.parse(libraryInterface);
             switch (libraryInterface.constructorName) {
                 case 'AmpacheInterface':
-                    this.state.libraryInterface = new AmpacheMusicLibraryInterface(libraryInterface);
+                    libraryInterface = new AmpacheMusicLibraryInterface(libraryInterface);
                     break;
             }
+            libraryInterface.ping()
+                .then(result => {
+                    this.state.libraryInterface = libraryInterface;
+                }, err => {
+                    this.state.libraryInterface = null;
+                    localStorage.removeItem('libraryInterface');
+                });
         }
         this.on('createlibraryinterface', evt => {
             if (evt.shouldRemember) {

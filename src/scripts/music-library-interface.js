@@ -57,18 +57,24 @@ class MusicLibraryInterface {
             });
     }
 
-    request(endpoint) {
-        return fetch(endpoint)
+    request(endpoint, transformName) {
+        return fetch(typeof endpoint !== "string" ? this.formEndpoint(Object.assign(endpoint)) : endpoint)
             .then(request => this.transforms.request ? this.transforms.request.call(this, request) : request)
+            .then(response => {
+                return transformName ? this.transforms[transformName].call(this, response) : response
+            })
     }
 
     getArtists(opts) {
 
     }
 
+    ping(params) {
+        return this.request(params, 'ping');
+    }
+
     songs(params) {
-        return this.request(this.formEndpoint(Object.assign(params)))
-            .then(payload => this.transforms.songs ? this.transforms.songs.call(this, payload) : payload)
+        return this.request(params, 'songs');
     }
 
     serialize() {
