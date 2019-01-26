@@ -1,0 +1,160 @@
+.song-list-component {
+    &:not(.edgeless) {
+        & .songs-table {
+            padding: 0 8px;
+            box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
+            transition: box-shadow 0.28s cubic-bezier(0.4,0,0.2,1);
+        }
+    }
+
+    & .songs-table {
+        color: #616161;
+        background-color: white;
+        width: 100%;        
+
+        & td.playing {
+            background-color: #f5f5f5;
+        }
+
+        & tr {
+            display: grid;
+            
+            grid-template-columns: 60px calc(55% - 60px) 90px calc(45% - 90px);
+            &:last-child {
+                & th, & td {
+                    border-bottom: none;
+                }
+            }
+
+            &:hover:not(.playing-song) {
+                & td.track-cell {
+                    position: relative;
+                    cursor: pointer;
+                    color: transparent;
+                    &::before {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                        transform: translateY(-50%);
+                        border: 10px solid transparent;
+                        border-left-width: 15px;
+                        border-right-width: 15px;
+                        border-left-color: black;
+                    }
+                }
+            }
+
+            &.playing-song {
+                background-color: #f5f5f5;
+
+                & td.track-cell {
+                    position: relative;
+                    cursor: pointer;
+                    color: transparent;
+                    background-clip: content-box;
+
+
+                    background-color: black;
+                    /* background-clip: content-box; */
+                    width: 20px;
+                    box-sizing: border-box;
+                    padding: 0 7px;
+                    height: 18px;
+                    /* justify-content: center; */
+                    /* align-content: center; */
+                    align-self: center;
+                    justify-self: end;
+                    margin-right: 10px;
+                    transform-origin: bottom center;
+                    animation: eq-bar 1s 0s infinite alternate cubic-bezier(.66,1.7,.57,.14);
+
+                    /* &, &::after, &::before {
+                        animation-direction: alternate;
+                    } */
+
+                    &::before {
+                        content: '';
+                        display: block;
+                        position: absolute;
+                        transform-origin: bottom center;
+                        right: 1px;
+                        top: 0;
+                        background-color: black;
+                        width: 5px;
+                        height: 18px;
+                        animation: eq-bar 1s 0.75s infinite alternate cubic-bezier(.66,1.7,.57,.14);
+                    }
+
+                    &::after {
+                        content: '';
+                        top: 0;
+                        display: block;
+                        transform-origin: bottom center;
+                        position: absolute;
+                        left: 1px;
+                        background-color: black;
+                        width: 5px;
+                        height: 18px;
+                        animation: eq-bar 1s 1.25s infinite alternate cubic-bezier(.66,1.7,.57,.14);
+                    }
+                }
+            }
+        }
+
+        &.single-artist {
+            & tr {
+                grid-template-columns: 60px auto 90px;
+            }
+        }
+
+        & th, & td {
+            padding: 11px 11px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            /* text-align: left; */
+        }
+
+        & td {
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        & .track-cell {
+
+            text-align: right;
+        }
+
+        & .duration-cell {
+            text-align: right;
+        }
+        & .title-cell, & .artist-cell {
+            text-align: left;
+        }
+        & .title-cell {
+            position: relative;
+            &:hover {
+                &::after {
+                    content: attr(data-title);
+                }
+            }
+            &::after {
+                position: absolute;
+                bottom: 100%;
+                background-color: gray;
+            }
+        }
+    }
+}
+
+@keyframes eq-bar {
+    from {
+        transform:  scale(1, 0);
+    }
+
+    to {
+        transform:  scale(1, 1);
+    }
+}

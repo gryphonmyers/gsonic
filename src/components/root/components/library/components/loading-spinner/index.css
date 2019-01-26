@@ -1,0 +1,124 @@
+:root {
+    --bg-color: #fafafa;
+    --size: 2.7em;
+    --border-width: 4px;
+}
+
+.loading-spinner-component {
+    box-sizing: border-box;
+    position: relative;
+    width: var(--size);
+    margin: .1em;
+    height: var(--size);
+    border: var(--border-width) solid red;
+    animation: load2 1.75s linear infinite;
+
+    &,
+    &:before,
+    &:after {
+        border-radius: 50%;
+    }
+
+    &::before,
+    &::after {
+        border: calc(var(--size) / 2 + .1em) solid var(--bg-color);
+        width: 0;
+        height: 0;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-sizing: border-box;
+        content: '';
+    }
+
+    &:before {
+        border: calc(var(--size) / 2 + .1em) solid var(--bg-color);
+        animation: cutoff 1.75s linear infinite, steps 1.75s step-end infinite;
+        border-bottom-color: transparent;
+        border-left-color: transparent;
+    }
+
+    &:after {
+        border: calc(var(--size) / 2 + .1em) solid var(--bg-color);
+        animation: cutoff-2 1.75s linear infinite, steps-2 1.75s step-end infinite;
+        border-top-color: transparent;
+        border-right-color: transparent;
+    }
+}
+
+@keyframes steps {
+    0% {
+
+    }
+
+    25% {
+        border-right-color: transparent;
+        
+    }
+
+    37.5% {
+        border-top-color: transparent;
+    }
+
+    50% {
+    }
+
+
+    62.5% {
+        border-bottom-color: var(--bg-color);
+        
+    }
+
+    75% {
+        border-right-color: var(--bg-color);
+    }
+
+    87.5% {
+        border-top-color: var(--bg-color);
+    }
+    
+}
+@keyframes steps-2 {
+    0% {
+
+    }
+
+    24% {
+        border-bottom-color: transparent;
+    }
+}
+@keyframes cutoff-2 {
+    0% {
+        transform: translate(-50%, -50%) rotate(-10deg);
+    }
+    12.5% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    87.5% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(10deg);
+    }
+}
+
+@keyframes cutoff {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    
+    100% {
+        transform: translate(-50%, -50%) rotate(720deg);
+    }
+}
+
+  
+@keyframes load2 {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(440deg);
+    }
+}

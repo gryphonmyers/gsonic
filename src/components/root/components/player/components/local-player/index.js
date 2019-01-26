@@ -1,33 +1,51 @@
+const defaults = require('defaults-es6');
+
 function getSources(song) {
-    return [{src: song.url, type: song.type}];
+    return [{src: song.url, type: song.contentType}];
 }
 
 module.exports = Component => class LocalPlayerComponent extends Component {
-    constructor(opts) {
-        super(Object.assign(opts, {
-            state: {
-                isBuffering: false,
-                playerID: function(){
-                    return 'player-' + this.$id;
-                },
-                sources: function() {
-                    return this.playingSong && this.isActive ? getSources(this.playingSong) : [];
-                }
+
+    static get styles() {
+        return require('./index.css');
+    }
+
+    static get state() {
+        return defaults({
+            isBuffering: false,
+            playerID: function(){
+                return 'player-' + this.$id;
             },
-            inputs: ['playingSong', 'isActive', 'currentTime'],
-            markupTemplate: require('./index.pug'),
-            styles: require('./index.css'),
-            components: {
+            sources: function() {
+                return this.playingSong ? getSources(this.playingSong) : [];
             }
-        }))
+        }, super.state);
+    }
+
+    static get inputs() {
+        return ['playingSong', 'isPlaying', 'currentTime', 'volume'];
+    }
+
+    static get markup() {
+        return require('./index.pug');
+    }
+
+    onSkipBack(evt) {
+        if (this.state.playingSong && this.audioEl) {
+            if (this.audioEl.currentTime < 5) {
+                this.trigger('skipsong', { delta: -1, source: this});
+            } else {
+                this.trigger('setplaybacktime', { newTime: 0 });
+            }
+        }
     }
 
     onEnded(evt) {
-        this.createAction('SONG_ENDED', Object.assign({}, evt));
+        this.trigger('songended', Object.assign({}, evt));
     }
 
     onTimeUpdate(evt) {
-        this.createAction('UPDATE_PLAYBACK_TIME', {newTime: evt.target.currentTime});
+        this.trigger('reportplaybacktime', {newTime: evt.target.currentTime, originPlayer: 'local' });
     }
 
     onCanPlayThrough(evt) {
@@ -35,28 +53,48 @@ module.exports = Component => class LocalPlayerComponent extends Component {
         evt.target.play();
     }
 
+    onVolumeChange(evt) {
+        this.trigger('updatevolume', { newVolume: evt.target.volume, source: this });
+    }
+
+    onDOMCreateOrChange() {
+        this.audioEl = this.el.querySelector('audio');
+    }
+
     onInit() {
-        this.state.watch('isActive', isActive => {
-            if (!isActive) {
-                // this.queryOnRender('')
-                //     .then(el => {
-                //         el.load()
-                //     })
-                this.once('renderdommarkup', evt => {
-                    this.state.isBuffering = true;
-                    var el = document.querySelector('#' + this.state.playerID + ' audio');
-                    if (el) el.pause();
-                });
-            }
-        })
-        this.state.watch('sources', sources => {
+        this.state.watch(['sources'], (sources) => {
             if (sources.length) {
-                this.once('renderdommarkup', evt => {
-                    this.state.isBuffering = true;
-                    var el = document.querySelector('#' + this.state.playerID + ' audio');
-                    if (el) el.load();
-                });
+                this.audioEl.src = sources[0].src;
             }
         });
+
+        this.state.watch('isPlaying', isPlaying => {
+            if (this.audioEl) {
+                if (isPlaying) {
+                    this.audioEl.play().catch(err => {
+                    })
+                } else {
+                    this.audioEl.pause();
+                }
+            }
+        });
+
+        this.state.watch(['currentTime'], (currentTime) => {
+            
+            if (this.audioEl) {
+                var timeDelta = Math.abs(this.audioEl.currentTime - currentTime);
+                if (timeDelta >= 1) {
+                    this.audioEl.currentTime = currentTime;
+                }
+            }
+        })
+
+        this.state.watch(['volume'], (volume) => {
+            if (this.audioEl) {
+                if (this.audioEl.volume !== volume) {
+                    this.audioEl.volume = volume;
+                }
+            }
+        })
     }
 }

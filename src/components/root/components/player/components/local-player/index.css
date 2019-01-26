@@ -1,3 +1,36 @@
-.my-element {
-    background-color: green;
+.local-player {
+    display: inline-block;
+    & audio {
+        max-width: 100%;
+        width: 600px;
+    }
+    & audio::-webkit-media-controls-panel {
+        background-color: white;
+    }
+    & .control {
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        font-size: 30px;
+        user-select: none;
+        vertical-align: middle;
+        
+        margin: 0 10px;
+        color: black;
+
+        &.active {
+            color: #ff5722;
+        }
+
+        &.disabled {
+            color: #e0e0e0;
+        }
+    }
+
+    & .play-button, & .pause-button {
+        margin: 8px 20px;
+        width: 70px;
+        height: 70px;
+        font-size: 70px;
+    }
 }

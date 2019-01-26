@@ -1,7 +1,162 @@
+:root {
+    --material-title-color: #212121;
+    --material-subtitle-color: #616161;
+    --active-color: #ff5722;
+
+    @custom-media --l-viewport-up (min-width: 1024px);
+}
+
 .player-component {
+    display: grid;
+    
+    grid-template-columns: 100fr auto 50fr 45px auto;
+    @media (--l-viewport-up) {
+        grid-template-columns: 100fr auto 80fr 45px auto;
+    }
+    grid-template-rows: 4px auto;
+    grid-template-areas: ". . . . ." "left-area . . cast-area music-queue-area";
+    align-items: center;
+    justify-content: space-between;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    
+    background-color: white;
+    z-index: 2;
+    box-shadow: 0 0 8px rgba(0,0,0,.4);
+    grid-column-gap: 15px;
+    padding-right: 20px;
+
+    &:hover {
+        & .song-progress {
+            background-color: #e6e6e6;
+        }
+    }
+
+    &:not(:hover) {
+        & .song-time-progress {
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.5s opacity, 0s 0.5s visibility;
+        }
+    }
+
+    & > * {
+        /* margin-top: 4px; */
+        grid-row-start: 2;
+    }
+
+    & .song-progress {
+        transition: 0.5s background-color, 0.5s background-image;
+        background-color: rgba(255,255,255, 0);
+        cursor: pointer;
+        z-index: 2;
+        margin-right: -20px;
+        margin-left: 100px;
+        padding: 15px 0;
+        height: 4px;
+        background-clip: content-box;
+        box-sizing: content-box;
+        grid-row-start: 1;
+        grid-column-end: span 5;
+        align-self: center;
+    }
+
+    & .now-playing {
+        align-items: center;
+        grid-area: left-area;
+        display: grid;
+        grid-template-columns: 100px auto;
+        grid-template-rows: 100fr auto auto 100fr;
+        grid-template-areas: ". ." ". ." ". ." ". .";
+        grid-column-gap: 10px;
+        grid-row-gap: 5px;
+
+        & .now-playing-cover {
+            grid-row-start: 1;
+            grid-row-end: span 4;
+            max-width: 100%;
+            margin-top: -4px;
+        }
+
+        & .now-playing-title, & .now-playing-subtitle {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        & .now-playing-title {
+            color: var(--material-title-color);
+            grid-row-start: 2;
+            font-size: 1.1em;
+        }
+
+        & .now-playing-subtitle {
+            &, & a {            
+                color: var(--material-subtitle-color);
+            }
+            & a {            
+                text-decoration: none;
+                &:hover  {
+                    text-decoration: underline;
+                }
+            }
+            font-size: 0.9em;
+            grid-row-start: 3;
+
+            & .spacer {
+                margin: 0 5px;
+            }
+        }
+
+        & .now-playing-artist {
+        }
+        & .now-playing-album {
+        }
+    }
+
+    & .cast-player {
+        grid-area: cast-area;
+        cursor: pointer;
+    }
+
+    & .song-queue {
+        overflow: auto;
+        max-height: calc(100vh - 200px);
+        position: absolute;
+        bottom: calc(100% + 20px);
+        right: 20px;
+        width: 700px;
+        z-index: 2;
+        background-color: white;
+        box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    & .song-queue-button {
+        grid-area: music-queue-area;
+        cursor: pointer;
+        width: 30px;
+        height: 30px;
+        font-size: 30px;
+        user-select: none;
+        vertical-align: middle;
+    }
+
+    & .song-time-progress {
+        transition: 0.5s opacity;
+        visibility: visible;
+        opacity: 1;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        color: var(--material-subtitle-color);
+        font-size: 0.8em;
+
+        & .song-start-time {
+            &::after {
+                content: '/';
+                margin: 0 5px;
+            }
+        }
+    }
 }

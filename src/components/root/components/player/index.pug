@@ -1,3 +1,48 @@
 .player-component(id=locals.playerID)
-    LocalPlayer
-    CastPlayer
+    .now-playing
+        if playingSong
+            img.now-playing-cover(src=playingSong.coverThumb)
+            .now-playing-title(title=playingSong.title)= playingSong.title
+            .now-playing-subtitle
+                if playingSong.artistId
+                    a.now-playing-artist(title=playingSong.artist, href=$routerLink({ name: 'artist', hash: playingSong.artistId }))= playingSong.artist
+                else
+                    span.now-playing-artist(title=playingSong.artist)= playingSong.artist
+                span.spacer -
+                a.now-playing-album(href=$routerLink({ name: 'album', hash: playingSong.albumId }), title=playingSong.album)= playingSong.album
+    .song-progress(
+        style="background-image: linear-gradient(to right, #ff5722, #ff5722 " + songProgressPercent + ", rgba(255,255,255,0) " + songProgressPercent + ");",
+        onclick=$bind("this.onSongProgressClick(event)")
+    )
+    local-player(
+        isPlaying = isPlaying && localPlayerActive, 
+        songQueue = nextSongs,
+        playingSong = playingSong, 
+        currentTime = currentTime,
+        volume = volume,
+        onsetplaybacktime = $bind("this.onSetPlaybackTime(event)")
+        onreportplaybacktime = $bind("this.onReportPlaybackTime(event)"), 
+        onsongended = $bind("this.trigger('songended', event)"),
+        onupdatevolume = $bind("this.onUpdateVolume(event)"),
+        onstartplayback = $bind("this.trigger('startplayback', event)"), 
+        onpauseplayback = $bind("this.trigger('pauseplayback', event)"),
+        onskipsong = $bind("this.trigger('skipsong', event)")
+    )
+    cast-player(
+        isPlaying = isPlaying && castPlayerActive, 
+        songQueue = nextSongs, 
+        playingSong = playingSong, 
+        currentTime = currentTime,
+        volume = volume,
+        onchangecastplayeractive = $bind("this.onChangeCastPlayerActive(event)"),
+        onreportplaybacktime = $bind("this.onReportPlaybackTime(event)"),
+        onsongended = $bind("this.trigger('songended', event)"),
+        onupdatevolume = $bind("this.onUpdateVolume(event)"))
+    .song-time-progress
+        if playingSong && currentTime
+            span.song-start-time= currentTimeFormatted
+            span.song-end-time= playingSong.durationFormatted
+    if showSongQueue
+        .song-queue
+            song-list.edgeless(songs=songQueue)
+    .song-queue-button.material-icons(onclick=$bind("this.showQueue(event)")) queue_music

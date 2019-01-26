@@ -1,33 +1,39 @@
-var AmpacheMusicLibraryInterface = require('../../../../scripts/ampache-interface');
+const defaults = require('defaults-es6');
+const SubsonicMusicLibraryInterface = require('../../../../scripts/subsonic-interface');
 
 module.exports = Component => class HomeComponent extends Component {
-    constructor(opts) {
-        super(Object.assign(opts, {
-            state: {
-                shouldRemember: false,
-                server: null,
-                timestamp: null,
-                user: null,
-                password: null,
-            },
-            markupTemplate: require('./index.pug'),
-            styles: require('./index.css'),
-            components: {
-                MaterialTextField: require('../../../material-text-field'),
-                MaterialButton: require('../../../material-button'),
-                MaterialSelectionControl: require('../../../material-selection-control')
-            }
-        }))
+
+    static get state() {
+        return defaults({
+            shouldRemember: false,
+            server: null,
+            timestamp: null,
+            user: null,
+            password: null,
+        }, super.state);
+    }
+
+    static get markup() {
+        return require('./index.pug');
+    }
+
+    static get styles() {
+        return require('./index.css');
+    }
+
+    static get components() {
+        return {
+            MaterialTextField: require('../../../material-text-field'),
+            MaterialButton: require('../../../material-button'),
+            MaterialSelectionControl: require('../../../material-selection-control')
+        };
     }
 
     submitForm(form) {
-        var libraryInterface = new AmpacheMusicLibraryInterface({server: this.state.server});
+        var libraryInterface = new SubsonicMusicLibraryInterface({server: this.state.server});
         return libraryInterface.auth(this.state.user, this.state.password)
             .then(token => {
-                this.createAction('createlibraryinterface', {libraryInterface, shouldRemember: this.state.shouldRemember === 'on'});
+                this.trigger('createlibraryinterface', {libraryInterface, shouldRemember: this.state.shouldRemember === 'on'});
             });
-    }
-
-    onInit() {
     }
 };

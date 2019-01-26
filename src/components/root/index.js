@@ -1,47 +1,148 @@
-var AmpacheMusicLibraryInterface = require('../../scripts/ampache-interface');
+var SubsonicMusicLibraryInterface = require('../../scripts/subsonic-interface');
+const defaults = require('defaults-es6');
 
 module.exports = Component => class RootComponent extends Component {
-    constructor(opts) {
-        super(Object.assign(opts, {
-            state: {
-                libraryInterface: null
-            },
-            markupTemplate: require('./index.pug'),
-            components: {
-                Library: [require('./components/library'), {libraryInterface: 'libraryInterface'}],
-                AuthForm: require('./components/auth-form'),
-                Player: require('./components/player')
-            }
-        }))
+
+    static get state() {
+        return defaults({
+            libraryInterface: null,
+            isPlaying: false,
+            playingSong: null,
+            isShuffled: false,
+            playbackStartIndex: 0,
+            songQueue: []
+        }, super.state);
+    }
+
+    static get markup() {
+        return require('./index.pug');
+    }
+
+    static get components() {
+        return {
+            library: [require('./components/library'), {libraryInterface: 'libraryInterface'}],
+            authform: require('./components/auth-form'),
+            player: require('./components/player')
+        }
     }
 
     static get styles() {
         return require('./index.css');
     }
 
+    setLibraryInterface(evt) {
+        if (evt.shouldRemember) {
+            localStorage.setItem('libraryInterface', JSON.stringify(evt.libraryInterface.serialize()));
+        }
+        this.state.libraryInterface = evt.libraryInterface;
+    }
+
+    static get hydrators() {
+        return {
+            libraryInterface: function(libraryInterface) {
+                if (libraryInterface) {
+                    switch (libraryInterface.constructorName) {
+                        case 'SubsonicInterface':
+                            return new SubsonicMusicLibraryInterface(libraryInterface);
+                    }
+                }
+                return libraryInterface;                
+            }
+        }
+    }
+
+    onPlay(evt) {
+        if (this.state.songQueue.length) {           
+            this.state.isPlaying = true;
+        }
+    }
+
+    onPause(evt) {
+        this.state.isPlaying = false;
+    }
+
+    playSongs(event) {
+        if (this.removeGeneratorCallback) this.removeGeneratorCallback();
+        if (event.songsGenerator) {
+            var generated = event.songsGenerator.next();
+            if (!generated.done) {
+                Promise.resolve(generated.value)
+                    .then(generatedSongs => {
+                        this.state.songQueue = generatedSongs
+                    })
+    
+                this.removeGeneratorCallback = this.state.watch(['songQueue', 'playbackStartIndex'], (songQueue, playbackStartIndex) => {
+                    if (songQueue.length <= playbackStartIndex) {
+                        var generated = event.songsGenerator.next();
+                        if (generated.done) {
+                            this.removeGeneratorCallback()
+                        } else {
+                            Promise.resolve(event.songsGenerator.next().value)
+                                .then(generatedSongs => {
+                                    this.state.songQueue = [...songQueue, ...generatedSongs];
+                                })  
+                        }            
+                    }
+                });
+            }
+            
+            this.state.playbackStartIndex = 0;
+        } else if (event.songs) {
+            this.state.songQueue = event.songs.reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], []);
+            this.state.playbackStartIndex = event.startIndex || 0;
+        }
+        
+        // this.state.shuffledIndices = Array.from({length: event.songs.length}).map((val, ii) => ii).shuffle();
+        this.state.isPlaying = true;
+    }
+
+    playSongsNext(event) {
+        if (this.state.isPlaying) {
+            this.state.songQueue = [...this.state.songQueue.slice(0, 1), ...event.songs.reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], []), ...this.state.songQueue.slice(1)]
+        } else {
+            this.playSongs(event);
+        }        
+    }
+
+    // playSongsShuffled(event) {
+    //     this.state.songQueue = event.songs.shuffle();
+    //     this.state.playbackStartIndex = event.startIndex || 0;
+    //     this.state.isPlaying = true;
+    // }
+
+    queueSongs(event) {
+        this.state.songQueue = this.state.songQueue.concat(event.songs).reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], []);;
+        // this.state.shuffledIndices = this.state.shuffledIndices.concat(Array.from({length: event.songs.length}).map((val, ii) => ii).shuffle())
+    }
+
+    // queueSongsShuffled(event) {
+    //     this.state.songQueue = this.state.songQueue.concat(event.songs.shuffle());
+    // }
+
+    onSongEnded(evt) {
+        this.state.playbackStartIndex++;
+    }
+
+    onSkipSong(evt) {
+        this.state.playbackStartIndex = Math.max(Math.min(this.state.playbackStartIndex + evt.delta, this.state.songQueue.length - 1), 0);
+    }
+
     onInit() {
+        this.state.watch('libraryInterface', libraryInterface => {
+            if (libraryInterface) {
+                libraryInterface.ping()
+                    .catch(err => {
+                        this.state.libraryInterface = null;
+                        localStorage.removeItem('libraryInterface');
+                    });
+            }
+        });
+
         var libraryInterface = localStorage.getItem('libraryInterface');
         if (libraryInterface) {
             libraryInterface = JSON.parse(libraryInterface);
-            switch (libraryInterface.constructorName) {
-                case 'AmpacheInterface':
-                    libraryInterface = new AmpacheMusicLibraryInterface(libraryInterface);
-                    break;
-            }
-            libraryInterface.ping()
-                .then(result => {
-                    this.state.libraryInterface = libraryInterface;
-                }, err => {
-                    this.state.libraryInterface = null;
-                    localStorage.removeItem('libraryInterface');
-                });
+            this.state.libraryInterface = libraryInterface;            
         }
-        this.on('createlibraryinterface', evt => {
-            if (evt.shouldRemember) {
-                localStorage.setItem('libraryInterface', evt.libraryInterface.serialize());
-            }
-            this.state.libraryInterface = evt.libraryInterface;
-        });
 
         if (process.env.NODE_ENV === 'development') {
             debugger;

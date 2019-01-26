@@ -1,0 +1,12 @@
+
+.artists-view {
+    padding-bottom: 50px;
+    &.is-loading {
+        & .artists {
+            display: flex;
+            justify-content: center;
+            min-height: 500px;
+            align-items: center;
+        }
+    }
+}

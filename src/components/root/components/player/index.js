@@ -1,66 +1,136 @@
-
-
+const defaults = require('defaults-es6');
+const formatTime = require('../../../../scripts/format-time');
 
 module.exports = Component => class PlayerComponent extends Component {
-    constructor(opts) {
-        super(Object.assign(opts, {
-            state: {
-                playingSong: null,
-                queue: [],
-                castPlayerActive: false,
-                localPlayerActive: function() {
-                    return !this.castPlayerActive;
-                },
-                playbackTime: null
+
+    static get state(){
+        return defaults({
+            isPlaying: false,
+            songQueue: [],
+            volume: 1,
+            isShuffled: false,
+            showSongQueue: false,
+            playbackStartIndex: 0,
+            castPlayerActive: false,
+            localPlayerActive: function() {
+                return !this.castPlayerActive;
             },
-            inputs: ['url'],
-            markupTemplate: require('./index.pug'),
-            styles: require('./index.css'),
-            components: {
-                CastPlayer: [require('./components/cast-player'), {
-                    castPlayerActive: 'isActive', playingSong: 'playingSong'
-                }],
-                LocalPlayer: [require('./components/local-player'), {
-                    localPlayerActive: 'isActive', playingSong: 'playingSong'
-                }]
+            playingSong: function() {
+                return this.songQueue.length ? this.songQueue[this.playbackStartIndex || 0] : null;
+            },
+            nextSongs: function(){
+                return this.songQueue.slice(1)
+            },
+            songProgressPercent: function() {
+                return this.playingSong ? ((this.currentTime / this.playingSong.duration) * 100).toFixed(2) + '%' : '0%';
+            },
+            inverseSongProgressPercent: function() {
+                return this.playingSong ? (100 - (this.currentTime / this.playingSong.duration) * 100).toFixed(2) + '%' : '0%';
+            },
+            // currentReportedTime: function() {
+            //     return this.castPlayerActive ? this.reportedTimes.cast : (this.localPlayerActive ? this.reportedTimes.local : null);
+            // },
+            // reportedTimes: {
+            //     'cast': null,
+            //     'local': null
+            // },
+            currentTime: null,
+            currentTimeFormatted: function(){
+                return this.currentTime ? formatTime(this.currentTime) : null
             }
-            // actionReducers: {
-            //     PLAY_SONG: function(song){
-            //         this.state.sources = [song];
-            //     }
-            // }
-        }))
+        }, super.state);
     }
 
-    playSong(song) {
-        this.state.playingSong = song;
+    static get inputs() {
+        return ['songQueue', 'isPlaying', 'playbackStartIndex', 'isShuffled'];
     }
 
-    queueSongs(songs) {
-        this.queue = songs;
+    static get markup(){
+        return require('./index.pug')
     }
 
-    playNextSong() {
-        this.playSong(this.state.queue.slice(0,1)[0]);
-        this.state.queue = this.state.queue.slice(1);
+    static get styles() {
+        return require('./index.css')
     }
 
-    changeCastPlayerActive(evt) {
-        this.state.castPlayerActive = evt.isActive;
+    static get components() {
+        return {
+            'local-player': require('./components/local-player'),
+            'cast-player': require('./components/cast-player'),
+            'song-list': require('../library/components/song-list')
+        };
     }
-
-    updatePlaybackTime(evt) {
-        this.state.playbackTime = evt.newTime;
+    
+    showQueue(evt) {
+        if (!this.state.showSongQueue) {
+            this.state.showSongQueue = true;
+            var callback;
+            evt.stopPropagation();
+            document.body.addEventListener('click', callback = (evt) => {
+                var domNode = evt.target;
+                while (domNode) {
+                    if (domNode.classList.contains('song-queue')) {
+                        return;
+                    }
+                    domNode = domNode.parentElement;
+                }
+                this.state.showSongQueue = false;
+                document.body.removeEventListener('click', callback);
+            })
+        }
+        
     }
 
     onInit() {
-        this.on('UPDATE_PLAYBACK_TIME', this.updatePlaybackTime);
-        this.on('PLAY_SONG', this.playSong);
-        this.on('QUEUE_SONGS', this.queueSongs);
-        this.on('SONG_ENDED', this.playNextSong);
-        this.on('CHANGE_CAST_PLAYER_ACTIVE', this.changeCastPlayerActive)
+        this.state.watch('playingSong', playingSong => {
+            if (playingSong) {
+                // debugger;
+                // this.state.currentTime = 0;
+            } else {
+                this.state.currentTime = null;
+            }
+            this.trigger('playingsongchange', { playingSong })  
+        })
+
+        // this.state.watch('castPlayerActive', castPlayerActive => {
+        //     if (castPlayerActive) {
+        //         if (this.state.reportedTime.local != null) {
+        //             this.state.currentTime = this.state.reportedTimes.local;
+        //         }                
+        //     } else {
+        //         if (this.state.reportedTime.cast != null) {
+        //             this.state.currentTime = this.state.reportedTimes.cast;
+        //         }                
+        //     }
+        // })
     }
 
-    onEnter() {
+
+    onSongProgressClick(evt) {
+        if (this.state.playingSong) {
+            var ratio = evt.offsetX / evt.target.clientWidth;
+
+            this.state.currentTime = this.state.playingSong.duration * ratio;
+        }
+    }
+
+    onUpdateVolume(evt) {
+        this.state.volume = evt.newVolume;
+    }
+
+    onChangeCastPlayerActive(evt) {
+        this.state.castPlayerActive = evt.isActive;
+    }
+
+    onSetPlaybackTime(evt) {
+        this.state.currentTime = evt.newTime;
+    }
+
+    onReportPlaybackTime(evt) {
+        if (evt.originPlayer) {
+            // this.state.reportedTimes = defaults({ [evt.originPlayer] : evt.newTime}, this.state.reportedTimes);
+            this.state.currentTime = Math.floor(evt.newTime);
+            
+        }
     }
 }

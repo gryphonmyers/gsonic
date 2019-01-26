@@ -1,0 +1,89 @@
+.artist-view {
+    padding: 20px;
+    &.is-loading {
+        display: flex;
+        justify-content: center;
+        min-height: 500px;
+        align-items: center;
+    }
+
+    & .artist-control {
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+    & .artist-name {
+        font-size: 2.4em;
+        margin: 0 65px 5px 0;
+        font-weight: normal;
+        grid-area: name;
+        align-self: end;
+    }
+
+    & .play-artist {
+        font-size: 30px;
+        margin-bottom: 5px;
+        margin-right: 5px;
+        cursor: pointer;
+        grid-area: name;
+        padding: 8px;
+        color: black;
+        background-color: white;
+        border-radius: 50%;
+        border: 1px solid #a3a3a3;
+        transition: 0.25s border, 0.25s padding;
+        &:hover {
+            border-width: 3px;
+            padding: 6px;
+        }
+        grid-row-start: 1;
+        justify-self: end;
+        align-self: flex-end;
+    }
+    & .artist-metadata {
+        grid-area: metadata;
+    }
+
+    & .artist-controls {
+        grid-area: controls;
+    }
+
+    & .artist-image  {
+        max-width: 100%;
+        grid-row-start: 1;
+        grid-area: art;
+        justify-self: center;
+        grid-row-end: span 5;
+        border-radius: 50%;
+    }
+    & .artist-bio {
+        line-height: 1.4em;
+        font-size: 0.9em;
+    }
+
+    & .artist-bio, & .artist-metadata {
+        color: rgba(0, 0, 0, 0.54);
+    }
+    & .artist-details {
+        display: grid;
+        align-items: center;
+        column-gap: 20px;
+        align-items: center;
+        grid-template-columns: 200px auto 1fr;
+        grid-template-rows: 1fr 60px 30px 50px 1fr;
+        grid-template-areas: "art . ."
+            "art name ."
+            "art metadata ."
+            "art controls ."
+            "art . .";
+        margin: 50px 0;
+    }
+
+    & .artist-controls {
+        display: grid;
+        justify-self: start;
+        grid-column-gap: 10px;
+        grid-template-columns: repeat(4, 1fr);
+        justify-items: center;
+    }
+}

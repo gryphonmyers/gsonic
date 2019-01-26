@@ -1,0 +1,15 @@
+.song-list-component()&attributes($attributes)
+    table.songs-table(class={'single-artist': isSingleArtist})
+        tr
+            th.track-cell #
+            th.title-cell Name
+            th.duration-cell.material-icons access_time
+            if !isSingleArtist
+                th.artist-cell Artist
+        each song in songs
+            tr(class={ 'playing-song': playingSong && playingSong.id === song.id })
+                td.track-cell(data-title=song.title, onclick=$bind("this.playSongListStartingFromId('" + song.id + "')"))= song.track
+                td.title-cell= song.title
+                td.duration-cell= song.durationFormatted
+                if !isSingleArtist
+                    td.artist-cell= song.artist

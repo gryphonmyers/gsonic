@@ -1,6 +1,21 @@
 if libraryInterface
-    main
-        Player
-        RouterView
+    main.main
+        routerview(
+            onqueuesongs=$bind("this.queueSongs(event)"),
+            onplaysongs=$bind("this.playSongs(event)"),
+            onplaysongsnext=$bind("this.playSongsNext(event)"),
+            playingSong = playingSong
+        )
+        player(
+            isPlaying = isPlaying, 
+            songQueue = songQueue,
+            isShuffled = isShuffled, 
+            playbackStartIndex = playbackStartIndex,
+            onsongended = $bind("this.onSongEnded(event)"), 
+            onstartplayback = $bind("this.onPlay(event)"), 
+            onpauseplayback = $bind("this.onPause(event)"),
+            onskipsong = $bind("this.onSkipSong(event)"),
+            onplayingsongchange = $bind("this.state.playingSong = event.playingSong")
+        )
 else
-    AuthForm
+    authform(oncreatelibraryinterface="this.setLibraryInterface(event)")

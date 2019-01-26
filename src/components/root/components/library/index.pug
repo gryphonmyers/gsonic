@@ -1,2 +1,42 @@
 .music-library
-    SongsView
+    nav.music-library-nav
+        ul.links
+            li(class={ 'active': $currentRoute.route.name === 'artists' })
+                a(href=$routerLink({ name: 'artists' })) Artists
+            li(class={ 'active': $currentRoute.route.name === 'albums' })
+                a(href=$routerLink({ name: 'albums' })) Albums
+        materialtextfield#search-field(placeholder="Search albums, artists or songs", label="Search", 
+            onkeyup=$bind("this.onSearchKeyup(event)"), 
+            oninput=$bind("this.onSearchFieldInput(event)"),
+            onfocus=$bind("this.onSearchFieldFocus(event)"))
+        .search-results(class={ 'active': searchResults && showSearchResults})
+            if searchResults && searchResults.albums
+                .albums.search-results-group
+                    h4 Albums
+                    each album in searchResults.albums
+                        .search-results-album.search-results-item
+                            img.album-cover.search-results-cover(src=album.coverThumb)
+                            a.album-title.search-results-title(href=$routerLink({ name: 'album', hash: album.id }))= album.title
+                            a.album-artist.search-results-subtitle(href=$routerLink({ name: 'artist', hash: album.artistId}))= album.artist
+            if searchResults && searchResults.artists
+                .artists.search-results-group
+                    h4 Artists
+                    each artist in searchResults.artists
+                        .search-results-artist.searech-results-item
+                            //- img.artist-cover(src=artist.coverThumb)
+                            a.artist-name.search-results-title(href=$routerLink({ name: 'artist', hash: artist.id }))= artist.name
+            if searchResults && searchResults.songs
+                .songs.search-results-group
+                    h4 Songs
+                    each song in searchResults.songs
+                        .search-results-song.search-results-item
+                            img.song-cover.search-results-cover(src=song.coverThumb)
+                            a.song-title.search-results-title(href=$routerLink({ name: 'album', hash: song.albumId }))= song.title
+                            .song-album-artist.search-results-subtitle= song.artist + ' – ' + song.album
+    routerview(
+        libraryInterface = libraryInterface,
+        playingSong = playingSong,
+        onqueuesongs=$bind("this.trigger('queuesongs', event)"), 
+        onplaysongs=$bind("this.trigger('playsongs', event)"),
+        onplaysongsnext=$bind("this.trigger('playsongsnext', event)")
+    )

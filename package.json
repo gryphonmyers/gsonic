@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Subsonic / Ampache web client inspired by Google Play Music.",
   "scripts": {
-    "start": "budo ./src/scripts/app.js:dist/bundle.js --host=gsonic.loc --index=index.html -- -t [ pugvdomify ] -t [ browserify-postcss --plugin postcss-cssnext ]",
+    "start": "budo ./src/scripts/app.js:dist/bundle.js --index=index.html -- -t [ pugvdomify ] -t [ browserify-postcss --plugin postcss-cssnext ]",
     "build": "node ./build.js"
   },
   "keywords": [],
@@ -17,7 +17,7 @@
     "postcss": "^6.0.13",
     "postcss-cssnext": "^2.11.0",
     "small-supplant": "0.0.4",
-    "weddell": "^1.2.1",
+    "weddell": "^3.0.1-16",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {

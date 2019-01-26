@@ -1,7 +1,103 @@
-.my-element {
-    background-color: green;
+:root {
+    --material-title-color: #212121;
+    --material-subtitle-color: #616161;
+}
 
-    & .test {
-        background-color: red;
+.music-library {
+    & .music-library-nav {
+        display: flex;
+        position: relative;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        background-color: white;
+        border-bottom: 1px solid #e0e0e0;
+        transition: border-color 0.2s ease;
+        & a {
+            text-decoration: none;
+            font-weight: 500;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        & .links {
+            padding: 0;
+            margin: 0;
+            display: inline-block;
+        }
+
+        & #search-field {
+            display: inline-block;
+        }
+
+        & li {
+            display: inline-block;
+            padding: 20px 12px;
+            text-transform: uppercase;
+
+            &.active {
+                border-bottom: 4px solid red;
+            }
+        }
+        & .search-results-title {
+            font-size: 1.1em;
+            margin-bottom: 4px;
+            color: var(--material-title-color);
+            
+            display: block;
+        }
+        & .search-results-subtitle {
+            display: block;
+            color: var(--material-subtitle-color);
+        }
+
+        & .search-results-title, & .search-results-subtitle {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        & .search-results {
+            font-size: 0.9em;
+            overflow-y: auto;
+            padding: 16px;
+            z-index: 2;
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.3);
+            transition: box-shadow 0.28s cubic-bezier(0.4,0,0.2,1);
+            border-radius: 2px;
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 20px;
+            height: 500px;
+            width: 300px;
+            background-color: white;
+
+            &.active {
+                display: block;
+            }
+        }
+
+        & .search-results-item {
+            display: grid;
+            grid-template-rows: auto auto;
+            align-items: center;
+            grid-template-columns: 50px auto;
+            margin-bottom: 15px;
+        }
+
+        & .search-results-cover {
+            width: 40px;
+            display: grid;
+            grid-row-start: 1;
+            grid-row-end: span 2;
+        }
+
+        & .search-results-group {
+            & h4 {
+                text-transform: uppercase;
+            }
+            margin-bottom: 15px;
+        }
     }
+    background-color: #fafafa;
 }

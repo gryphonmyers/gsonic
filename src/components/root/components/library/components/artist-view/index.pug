@@ -1,0 +1,22 @@
+.artist-view(class={'is-loading': isLoading})
+    if isLoading
+        loading-spinner
+    else
+        modal(isActive=shouldShowBio, onclosemodal=$bind("this.state.shouldShowBio = false"))
+            p.artist-bio!= artist.bio
+        .artist-details
+            img.artist-image(src=artist.image)
+            h2.artist-name(title=artist.name)= artist.name
+            .play-artist.album-control.material-icons(title="Play album" onclick=$bind("this.onPlayClick(event)")) play_arrow
+            .artist-metadata
+                span.artist-num-albums= albums.length + ' albums'
+            .artist-controls
+                .shuffle-artist.artist-control.material-icons(title="Shuffle artist's songs" onclick=$bind("this.onShuffleClick(event)")) shuffle
+                //- .play-artist-next.artist-control.material-icons(title="Play artists's songs after currently playing song" onclick=$bind("this.onPlayNextClick(event)")) play_arrow
+                //- .play-artist-next-shuffled.artist-control.material-icons(title="Shuffle artists's songs after currently playing song" onclick=$bind("this.onPlayNextClickShuffled(event)")) play_arrow
+                .queue-artist.artist-control.material-icons(title="Add artist's songs to queue" onclick=$bind("this.onQueueClick(event)")) queue
+                //- .queue-artist-shuffled.artist-control.material-icons(title="Shuffle artist's songs to queue" onclick=$bind("this.onQueueShuffledClick(event)")) play_arrow
+                .artist-radio.artist-control.material-icons(title="Start artist radio", onclick=$bind("this.onRadioClick(event)")) radio
+                .bio-button.artist-control.material-icons(title="Read artist bio", onclick=$bind("this.state.shouldShowBio = true;")) person
+        .albums
+            album-list(albums=albums)

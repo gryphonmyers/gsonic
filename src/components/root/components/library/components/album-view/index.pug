@@ -1,0 +1,22 @@
+.album-view(class={'is-loading': isLoading})
+    .songs
+        if isLoading
+            loading-spinner
+        else
+            modal(isActive = showCoverModal, onclosemodal=$bind("this.state.showCoverModal = false"))
+                img.album-art(src=album.coverArt)
+            .album-info
+                img.album-art(src=album.coverArt, onclick=$bind("this.state.showCoverModal = true"))
+                h2.album-title(title=album.title)= album.title
+                .play-album.album-control.material-icons(title="Play album" onclick=$bind("this.onPlayClick(event)")) play_arrow
+                a.album-artist(title=album.artist, href=$routerLink({ name: 'artist', hash: album.artistId }))= album.artist
+                .album-metadata
+                    if albumYear
+                        span.album-year= albumYear
+                    span.album-num-songs= songs.length + ' songs'    
+                    span.album-duration= songsDurationFormatted
+                    if albumGenre
+                        span.album-genre= albumGenre
+                .album-controls
+                    .shuffle-album.album-control.material-icons(title="Shuffle album's songs" onclick=$bind("this.onShuffleClick(event)")) shuffle
+            song-list(playingSong = playingSong, songs=songs, onplaysongs=$bind("this.trigger('playsongs', event)"))

@@ -1,0 +1,60 @@
+:root {
+    @custom-media --s-viewport-up (min-width: 640px);
+    @custom-media --m-viewport-up (min-width: 1024px);
+    @custom-media --l-viewport-up (min-width: 1360px);
+}
+
+.album-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-gap: 20px;
+    @media (--s-viewport-up) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    @media (--m-viewport-up) {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    @media (--l-viewport-up) {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+    & .album {
+        border-radius: 2px;
+        box-shadow: 0 1px 4px 0 rgba(0,0,0,0.37);
+        transition: box-shadow 0.28s cubic-bezier(0.4,0,0.2,1);
+        background-color: white;
+
+        &:hover {
+            box-shadow: 0 2px 2px 0 rgba(0,0,0,0.2), 0 6px 10px 0 rgba(0,0,0,0.3);
+        }
+    
+        & .album-thumb {
+            /* margin-bottom: 20px; */
+            width: 100%;
+        }
+    
+        & .album-details {
+            padding: 16px;
+        }
+    
+        & .album-title, & .album-artist {
+            display: block;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            text-decoration: none;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    
+        & .album-title {
+            font-size: 1.1em;
+            margin-bottom: 6px;
+            color: #212121;
+        }
+    
+        & .album-artist {
+            color: #616161;
+        }
+    }
+}

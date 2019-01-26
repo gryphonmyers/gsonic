@@ -1,0 +1,6 @@
+.artists-view(class={'is-loading': isLoading})
+    .artists
+        if isLoading
+            loading-spinner
+        else
+            artist-list(artists=artists)

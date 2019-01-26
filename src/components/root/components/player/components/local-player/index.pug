@@ -1,10 +1,35 @@
-.local-player(id=locals.playerID)
-    audio(controls, 
-        oncanplaythrough=$bind("this.onCanPlayThrough(event)"), 
-        onended=$bind("this.onEnded(event)")
-        ontimeupdate=$bind("this.onTimeUpdate(event)"))
-        each source in locals.sources
-            source(src=source.src, type=source.type)
+.local-player(id=locals.playerID, class={'is-buffering': isBuffering})
+    audio( 
+        oncanplaythrough = $bind("this.onCanPlayThrough(event)"), 
+        onended = $bind("this.onEnded(event)")
+        ontimeupdate = $bind("this.onTimeUpdate(event)"),
+        onvolumechange = $bind("this.onVolumeChange(event)"),
+        preload,
+        onerror="console.error(event)"
+    )
+        //- each source in locals.sources
+        //-     source(src = source.src, type = source.type)
+    .controls
+        .repeat.control.material-icons repeat
+        .skip-previous.control.material-icons(
+            onclick = $bind("this.onSkipBack(event)")
+        ) skip_previous
 
-    if locals.isBuffering
-        span.buffering Buffering...
+        if isPlaying
+            .pause-button.control.material-icons(
+                class = { active: playingSong, disabled: !playingSong }, 
+                onclick = $bind("this.trigger('pauseplayback', { source: this})")
+            ) pause_circle_filled
+        else
+            .play-button.control.material-icons(
+                class = { active: playingSong, disabled: !playingSong }, 
+                onclick = $bind("this.trigger('startplayback', { source: this})")
+            ) play_circle_filled_white
+        
+        .skip-next.control.material-icons(
+            onclick = $bind("this.trigger('skipsong', { delta: 1, source: this})")
+        ) skip_next
+        .shuffle.control.material-icons shuffle
+
+        .volume-up.control.material-icons volume_down
+        .volume-down.control.material-icons volume_up
