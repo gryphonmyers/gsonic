@@ -45,10 +45,16 @@ module.exports = Component => class LocalPlayerComponent extends Component {
     }
 
     onTimeUpdate(evt) {
-        this.trigger('reportplaybacktime', {newTime: evt.target.currentTime, originPlayer: 'local' });
+        if (this.state.isPlaying) {
+            console.log('time update', evt)
+            this.trigger('reportplaybacktime', {newTime: evt.target.currentTime, originPlayer: 'local' });
+        } else {
+            this.audioEl.pause()
+        }        
     }
 
     onCanPlayThrough(evt) {
+        console.log(evt)
         this.state.isBuffering = false;
         evt.target.play();
     }
@@ -61,6 +67,15 @@ module.exports = Component => class LocalPlayerComponent extends Component {
         this.audioEl = this.el.querySelector('audio');
     }
 
+    static get watchers() {
+        return {
+            sources: sources => {
+
+            },
+            
+        }
+    }
+
     onInit() {
         this.state.watch(['sources'], (sources) => {
             if (sources.length) {
@@ -71,6 +86,10 @@ module.exports = Component => class LocalPlayerComponent extends Component {
         this.state.watch('isPlaying', isPlaying => {
             if (this.audioEl) {
                 if (isPlaying) {
+                    if (this.state.currentTime) {
+                        this.audioEl.currentTime = this.state.currentTime;
+                    }
+                    
                     this.audioEl.play().catch(err => {
                     })
                 } else {
@@ -80,11 +99,11 @@ module.exports = Component => class LocalPlayerComponent extends Component {
         });
 
         this.state.watch(['currentTime'], (currentTime) => {
-            
             if (this.audioEl) {
-                var timeDelta = Math.abs(this.audioEl.currentTime - currentTime);
-                if (timeDelta >= 1) {
-                    this.audioEl.currentTime = currentTime;
+                if (this.state.isPlaying) {
+                    if (Math.abs(currentTime - this.audioEl.currentTime) > 1) {
+                        this.audioEl.currentTime = currentTime;
+                    }
                 }
             }
         })
