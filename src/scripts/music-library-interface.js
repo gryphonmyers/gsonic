@@ -65,6 +65,14 @@ class MusicLibraryInterface {
                 this.duration = opts.duration;
             }
 
+            serialize(){ 
+                return Object.assign(JSON.parse(JSON.stringify(this)), { musicDataType: 'song'});
+            }
+
+            static deserialize(obj) {
+                return new this(obj);
+            }
+
             get contentType() {
                 return api.getContentType(this)
             }
@@ -96,6 +104,14 @@ class MusicLibraryInterface {
                 // this.releaseMbid = opts.
                 // this.releaseGroupMbid = opts.
             }
+
+            serialize(){ 
+                return Object.assign(JSON.parse(JSON.stringify(this)), { musicDataType: 'artist'});
+            }
+
+            static deserialize(obj) {
+                return new this(obj);
+            }
         }
     }
 
@@ -122,6 +138,27 @@ class MusicLibraryInterface {
                 // this.releaseMbid = opts.
                 // this.releaseGroupMbid = opts.
             }
+
+            serialize(){ 
+                return Object.assign(JSON.parse(JSON.stringify(this)), { musicDataType: 'album'});
+            }
+
+            static deserialize(obj) {
+                return new this(obj);
+            }
+        }
+    }
+
+    deserialize(obj) {
+        switch (obj.musicDataType) {
+            case 'artist':
+                return this.Artist.deserialize(obj);
+            case 'album':
+                return this.Album.deserialize(obj);
+            case 'song':
+                return this.Song.deserialize(obj);
+            default:
+                throw new Error(`Cannot deserialize object with unrecognized musicDataType of '${obj.musicDataType}'`)
         }
     }
 

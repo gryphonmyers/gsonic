@@ -1,9 +1,9 @@
 .music-library
     nav.music-library-nav
         ul.links
-            li(class={ 'active': $currentRoute.route.name === 'artists' })
+            li(class={ 'active': $currentRouteName === 'artists' })
                 a(href=$routerLink({ name: 'artists' })) Artists
-            li(class={ 'active': $currentRoute.route.name === 'albums' })
+            li(class={ 'active': $currentRouteName === 'albums' })
                 a(href=$routerLink({ name: 'albums' })) Albums
         materialtextfield#search-field(placeholder="Search albums, artists or songs", label="Search", 
             onkeyup=$bind("this.onSearchKeyup(event)"), 

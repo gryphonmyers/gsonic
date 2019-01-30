@@ -28,16 +28,17 @@
         onpauseplayback = $bind("this.trigger('pauseplayback', event)"),
         onskipsong = $bind("this.trigger('skipsong', event)")
     )
-    cast-player(
-        isPlaying = isPlaying && castPlayerActive, 
-        songQueue = nextSongs, 
-        playingSong = playingSong, 
-        currentTime = currentTime,
-        volume = volume,
-        onchangecastplayeractive = $bind("this.onChangeCastPlayerActive(event)"),
-        onreportplaybacktime = $bind("this.onReportPlaybackTime(event)"),
-        onsongended = $bind("this.trigger('songended', event)"),
-        onupdatevolume = $bind("this.onUpdateVolume(event)"))
+    if isChrome
+        cast-player(
+            isPlaying = isPlaying && castPlayerActive, 
+            songQueue = nextSongs, 
+            playingSong = playingSong, 
+            currentTime = currentTime,
+            volume = volume,
+            onchangecastplayeractive = $bind("this.onChangeCastPlayerActive(event)"),
+            onreportplaybacktime = $bind("this.onReportPlaybackTime(event)"),
+            onsongended = $bind("this.trigger('songended', event)"),
+            onupdatevolume = $bind("this.onUpdateVolume(event)"))
     .song-time-progress
         if playingSong && currentTime
             span.song-start-time= currentTimeFormatted

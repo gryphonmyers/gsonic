@@ -13,6 +13,14 @@ module.exports = Component => class ArtistsViewComponent extends Component {
         return ['libraryInterface'];
     }
 
+    static get hydrators() {
+        return {
+            artists: function(val) {
+                return this.libraryInterface && val ? val.map(item => this.libraryInterface.Artist.deserialize(item)) : []
+            }
+        }
+    }
+
     static get markup() {
         return require('./index.pug');
     }
@@ -31,7 +39,7 @@ module.exports = Component => class ArtistsViewComponent extends Component {
         this.state.isLoading = true;
         this.state.libraryInterface.getArtists()
             .then(data => {
-                this.state.artists = data;
+                this.state.artists = data.map(artist => artist.serialize());
                 this.state.isLoading = false;
             })
     }
