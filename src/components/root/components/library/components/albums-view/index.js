@@ -11,6 +11,14 @@ module.exports = Component => class AlbumsViewComponent extends Component {
         }, super.state);
     }
 
+    static get hydrators() {
+        return {
+            albums: function(albums) {
+                return this.libraryInterface && albums ? albums.map(album => this.libraryInterface.Album.deserialize(album)) : [];
+            }
+        }
+    }
+
     static get inputs() {
         return ['libraryInterface'];
     }
@@ -42,26 +50,20 @@ module.exports = Component => class AlbumsViewComponent extends Component {
 
         switch(sortType) {
             case 'random':
-                this.state.libraryInterface.getRandomAlbums()
-                    .then(data => {
-                        this.state.albums = data;
-                    })
+                var prom = this.state.libraryInterface.getRandomAlbums()
                 break;
             case 'name':
-                this.state.libraryInterface.getAlbums({ sort: { name: 1 } })
-                    .then(data => {
-                        this.state.albums = data;
-                    })
+                prom = this.state.libraryInterface.getAlbums({ sort: { name: 1 } })
                 break;
             case 'added':
             default:
             case '':
-                this.state.libraryInterface.getAlbums({ sort: { added: -1 } })
-                    .then(data => {
-                        this.state.albums = data;
-                    })
+                prom = this.state.libraryInterface.getAlbums({ sort: { added: -1 } })
                 break;
         }
+        prom.then(albums => {
+            this.state.albums = albums.map(album => album.serialize());
+        })
     }
 
     onUpdate(evt) {

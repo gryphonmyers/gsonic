@@ -7,6 +7,17 @@ module.exports = Component => class PlayerComponent extends Component {
         return defaults({
             isPlaying: false,
             songQueue: [],
+            isChrome: function() {
+                var chrome;
+                try {
+                    chrome = global.chrome;
+                } catch (err) {}
+                if (chrome) return true;
+                try {
+                    chrome = window.chrome;
+                } catch (err) {}
+                return !!chrome;
+            },
             volume: 1,
             isShuffled: false,
             showSongQueue: false,

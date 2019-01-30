@@ -13,6 +13,17 @@ module.exports = Component => class SongsViewComponent extends Component {
         }, super.state);
     }
 
+    static get hydrators() {
+        return {
+            albums : function(val) {
+                return this.libraryInterface && val ? val.map(item => this.libraryInterface.Album.deserialize(item)) : []
+            },
+            artist : function(val) {
+                return this.libraryInterface && val ? this.libraryInterface.Artist.deserialize(val) : null
+            }
+        }
+    }
+
     static get inputs() {
         return ['libraryInterface'];
     }
@@ -120,8 +131,8 @@ module.exports = Component => class SongsViewComponent extends Component {
                 this.getArtistData(libraryInterface, evt.matches.hash)
                     .then(({artist, albums}) => {
                         this.state.isLoading = false;
-                        this.state.albums = albums;
-                        this.state.artist = artist;
+                        this.state.albums = albums.map(album => album.serialize());
+                        this.state.artist = artist.serialize();
                     })
             })
     }

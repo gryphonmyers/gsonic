@@ -22,12 +22,20 @@ module.exports = Component => class LibraryComponent extends Component {
         return ['libraryInterface', 'playingSong'];
     }
 
+    static get hydrators() {
+        return {
+            searchResults: function(searchResults) {
+                return this.libraryInterface && searchResults ? 
+                    searchResults.reduce((acc, curr) => Object.assign(acc, {[curr[0]]: curr[1] ? curr[1].map(item => this.libraryInterface.deserialize(item)) : null }), {}) : null;
+            }
+        }
+    }
+
     search(query='') {
         if (query) {
             this.state.libraryInterface.search({ query, limit: 3 })
-                .then(data => {
-                    this.state.searchResults = data;
-                    console.log(data);
+                .then(searchResults => {
+                    this.state.searchResults = Object.entries(searchResults).map(result => [result[0], result[1] ? result[1].map(item => item.serialize()) : null]);
                 });
         } else {
             this.state.searchResults = null;
@@ -46,7 +54,7 @@ module.exports = Component => class LibraryComponent extends Component {
     }
     onSearchFieldInput(evt) {
         if (!this.debouncedSearch) {
-            this.debouncedSearch = debounce(this.search.bind(this), 1500);
+            this.debouncedSearch = debounce(this.search.bind(this), 750);
         }
         this.debouncedSearch(evt.target.value);
     }

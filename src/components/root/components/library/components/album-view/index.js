@@ -26,6 +26,17 @@ module.exports = Component => class SongsViewComponent extends Component {
         }, super.state);
     }
 
+    static get hydrators() {
+        return {
+            album: function(album) {
+                return album && this.libraryInterface ? this.libraryInterface.Album.deserialize(album) : null;
+            },
+            songs: function(songs) {
+                return songs && this.libraryInterface ? songs.map(song => this.libraryInterface.Song.deserialize(song)) : []
+            }
+        }
+    }
+
     static get inputs() {
         return ['libraryInterface', 'playingSong'];
     }
@@ -70,8 +81,8 @@ module.exports = Component => class SongsViewComponent extends Component {
         this.state.isLoading = true;
         return this.fetchAlbumData(this.state.libraryInterface, evt.matches.hash)
             .then(({ songs, album }) => {
-                this.state.album = album;
-                this.state.songs = songs;
+                this.state.album = album.serialize();
+                this.state.songs = songs.map(song => song.serialize());
                 this.state.isLoading = false;
             })
     }
@@ -83,8 +94,8 @@ module.exports = Component => class SongsViewComponent extends Component {
                 this.fetchAlbumData(libraryInterface, evt.matches.hash)
                     .then(({ songs, album }) => {
                         this.state.isLoading = false;
-                        this.state.album = album;
-                        this.state.songs = songs;
+                        this.state.album = album.serialize();
+                        this.state.songs = songs.map(song => song.serialize());
                     })
             })
     }
