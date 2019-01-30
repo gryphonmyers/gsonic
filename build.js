@@ -24,15 +24,15 @@ function makeBundler(input, output) {
     }
     b.transform('pugvdomify');
     b.transform('browserify-postcss', {plugins: ['postcss-cssnext']});
-    bundle();
 
     function bundle() {
-        b.bundle()
+        return b.bundle()
             .on('error', evt => console.error(evt.stack))
+            .on('end', ()=> process.exit())
             .pipe(fs.createWriteStream(output));
     }
 
     return bundle;
 }
 
-makeBundler('./src/scripts/app.js', "./dist/bundle.js")
+return makeBundler('./src/scripts/app.js', "./dist/bundle.js")()
