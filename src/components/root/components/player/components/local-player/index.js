@@ -23,7 +23,7 @@ module.exports = Component => class LocalPlayerComponent extends Component {
     }
 
     static get inputs() {
-        return ['playingSong', 'isPlaying', 'currentTime', 'volume'];
+        return ['playingSong', 'isPlaying', 'currentTime', 'volume', 'nextSongs'];
     }
 
     static get markup() {
@@ -46,7 +46,6 @@ module.exports = Component => class LocalPlayerComponent extends Component {
 
     onTimeUpdate(evt) {
         if (this.state.isPlaying) {
-            console.log('time update', evt)
             this.trigger('reportplaybacktime', {newTime: evt.target.currentTime, originPlayer: 'local' });
         } else {
             this.audioEl.pause()
@@ -54,7 +53,6 @@ module.exports = Component => class LocalPlayerComponent extends Component {
     }
 
     onCanPlayThrough(evt) {
-        console.log(evt)
         this.state.isBuffering = false;
         evt.target.play();
     }
@@ -113,6 +111,21 @@ module.exports = Component => class LocalPlayerComponent extends Component {
                 if (this.audioEl.volume !== volume) {
                     this.audioEl.volume = volume;
                 }
+            }
+        })
+
+        this.state.watch('nextSongs', nextSongs => {
+            if (nextSongs && nextSongs.length) {
+                nextSongs.slice(0, this.state.numSongsToPreload)
+                    .forEach(song => {
+                        var source = getSources(song)[0];
+                        fetch(source.src, {
+                            headers: {
+                                'content-type': source.type,
+                                'range': "bytes=0-"
+                            }
+                        })
+                    })
             }
         })
     }

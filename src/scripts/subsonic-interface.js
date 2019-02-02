@@ -119,13 +119,14 @@ class SubsonicInterface extends MusicLibraryInterface {
         var needDetails = this.apiVersion >= "1.11.0" && (!cachedArtist || !cachedArtist.bio);
         var promises = [];
         if (needArtist) {
-            promises.push(this.request('getMusicDirectory.view', {id}));
+            promises[0] = (this.request('getMusicDirectory.view', {id}));
         }
         if (needDetails) {
-            promises.push(this.request('getArtistInfo.view', { id, includeNotPresent: true }));
+            promises[1] = (this.request('getArtistInfo.view', { id, includeNotPresent: true }));
         }
-        return Promise.all(promises)
-            .then(([artistData, artistDetails]) => this.makeNewArtist(Object.assign({ name: artistData.directory.name, id }, artistDetails.artistInfo)));
+        var [artistData, artistDetails] = await Promise.all(promises);
+        
+        return this.makeNewArtist(Object.assign({}, cachedArtist || {}, artistData ? { name: artistData.directory.name, id } : {}, artistDetails ? artistDetails.artistInfo : {}));
     }
 
     makeNewAlbum(album) {
@@ -160,14 +161,14 @@ class SubsonicInterface extends MusicLibraryInterface {
             id: decodeURIComponent(song.id),
             track: song.track,
             duration: song.duration,
-            contentType: song.contentType
+            originalContentType: song.contentType
         })
     }
 
     makeNewArtist(artist) {
         if (artist.id in this.cache.artists) {
             var cachedArtist = this.cache.artists[artist.id];
-            if (cachedArtist.bio || !artist.bio) {
+            if (cachedArtist.bio || !artist.biography) {
                 return cachedArtist;
             }
         }

@@ -7,6 +7,4 @@ var app = new App({
     renderInterval: 16.667
 })
 
-app.init();
-
-module.exports = App;
+module.exports = app;

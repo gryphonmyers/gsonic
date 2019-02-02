@@ -13,7 +13,7 @@ module.exports = Component => class ArtistsViewComponent extends Component {
         return ['libraryInterface'];
     }
 
-    static get hydrators() {
+    static get deserializers() {
         return {
             artists: function(val) {
                 return this.libraryInterface && val ? val.map(item => this.libraryInterface.Artist.deserialize(item)) : []
@@ -35,8 +35,15 @@ module.exports = Component => class ArtistsViewComponent extends Component {
         }
     }
 
-    onMount() {
+    onEnter() {
         this.state.isLoading = true;
+    }
+
+    onUpdate() {
+        this.state.isLoading = true;
+    }
+
+    onMount() {        
         this.state.libraryInterface.getArtists()
             .then(data => {
                 this.state.artists = data.map(artist => artist.serialize());

@@ -61,7 +61,7 @@ class MusicLibraryInterface {
                 this.track = opts.track;
                 this.disc = opts.disc;
                 this.albumArtist = opts.albumArtist;
-                this.originalContentType = opts.contentType in mediaTypeAliases ? mediaTypeAliases[opts.contentType] : opts.contentType;
+                this.originalContentType = opts.originalContentType in mediaTypeAliases ? mediaTypeAliases[opts.originalContentType] : opts.originalContentType;
                 this.duration = opts.duration;
             }
 

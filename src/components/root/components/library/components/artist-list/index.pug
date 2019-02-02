@@ -1,7 +1,8 @@
 .artist-list
     each artist in artists
         .artist
-            if artist.thumb
-                img.artist-thumb(src=artist.thumb)
-            .artist-details
-                a.artist-name(href=$routerLink({ name: 'artist', hash: artist.id }))= artist.name
+            a(href=$routerLink({ name: 'artist', hash: artist.id }))
+                if artist.thumb
+                    .artist-thumb(style="background-image: url(" + artist.image + ");")
+                .artist-details
+                    .artist-name= artist.name

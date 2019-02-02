@@ -2,7 +2,7 @@ var debounce = require('debounce');
 const defaults = require('defaults-es6');
 const shuffle = require('../../../../../../scripts/array-shuffle');
 
-module.exports = Component => class SongsViewComponent extends Component {
+module.exports = Component => class ArtistViewComponent extends Component {
 
     static get state() {
         return defaults({
@@ -13,13 +13,24 @@ module.exports = Component => class SongsViewComponent extends Component {
         }, super.state);
     }
 
-    static get hydrators() {
+    static get deserializers() {
         return {
             albums : function(val) {
                 return this.libraryInterface && val ? val.map(item => this.libraryInterface.Album.deserialize(item)) : []
             },
             artist : function(val) {
                 return this.libraryInterface && val ? this.libraryInterface.Artist.deserialize(val) : null
+            }
+        }
+    }
+
+    static get serializers() {
+        return {
+            albums: function(albums) {
+                return albums && albums.length ? albums.map(album => album.serialize()) : []
+            },
+            artist: function(artist) {
+                return artist ? artist.serialize() : null;
             }
         }
     }
@@ -113,26 +124,15 @@ module.exports = Component => class SongsViewComponent extends Component {
         .then(([artist, albums]) => ({artist, albums}))
     }
 
-
-    onUpdate(evt) {
-        this.state.isLoading = true;
-        return this.getArtistData(this.state.libraryInterface, evt.matches.hash)
-            .then(({artist, albums}) => {
-                this.state.isLoading = false;
-                this.state.albums = albums;
-                this.state.artist = artist;
-            });
-    }
-
-    onEnter(evt) {
+    onEnterOrUpdate(evt) {
         this.state.isLoading = true;
         this.state.await('libraryInterface')
             .then(libraryInterface => {
                 this.getArtistData(libraryInterface, evt.matches.hash)
                     .then(({artist, albums}) => {
                         this.state.isLoading = false;
-                        this.state.albums = albums.map(album => album.serialize());
-                        this.state.artist = artist.serialize();
+                        this.state.albums = albums;
+                        this.state.artist = artist;
                     })
             })
     }

@@ -30,6 +30,17 @@ module.exports = Component => class RootComponent extends Component {
         return require('./index.css');
     }
 
+    static get serializers() {
+        return {
+            songQueue: function(songQueue) {
+                return songQueue ? songQueue.map(song => song.serialize()) : [];
+            },
+            playingSong: function(val) {
+                return val ? val.serialize() : null;
+            }
+        }
+    }
+
     setLibraryInterface(evt) {
         if (evt.shouldRemember) {
             localStorage.setItem('libraryInterface', JSON.stringify(evt.libraryInterface.serialize()));
@@ -37,8 +48,11 @@ module.exports = Component => class RootComponent extends Component {
         this.state.libraryInterface = evt.libraryInterface;
     }
 
-    static get hydrators() {
+    static get deserializers() {
         return {
+            playingSong: function(val) {
+                return val && this.libraryInterface ? this.libraryInterface.deserialize(val) : null;
+            },
             libraryInterface: function(libraryInterface) {
                 if (libraryInterface) {
                     switch (libraryInterface.constructorName) {
@@ -47,6 +61,10 @@ module.exports = Component => class RootComponent extends Component {
                     }
                 }
                 return libraryInterface;                
+            },
+            songQueue: function (songQueue) {
+                if (songQueue && songQueue.length && !this.libraryInterface) throw new Error('Library interface not defined before songQueue needs to be hydrated')
+                return songQueue ? songQueue.map(song => this.libraryInterface.deserialize(song)) : [];
             }
         }
     }
@@ -79,7 +97,7 @@ module.exports = Component => class RootComponent extends Component {
                         } else {
                             Promise.resolve(event.songsGenerator.next().value)
                                 .then(generatedSongs => {
-                                    this.state.songQueue = [...songQueue, ...generatedSongs];
+                                    this.state.songQueue = [...songQueue, ...generatedSongs]
                                 })  
                         }            
                     }
@@ -88,7 +106,7 @@ module.exports = Component => class RootComponent extends Component {
             
             this.state.playbackStartIndex = 0;
         } else if (event.songs) {
-            this.state.songQueue = event.songs.reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], []);
+            this.state.songQueue = event.songs.reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], [])
             this.state.playbackStartIndex = event.startIndex || 0;
         }
         
@@ -111,7 +129,9 @@ module.exports = Component => class RootComponent extends Component {
     // }
 
     queueSongs(event) {
-        this.state.songQueue = this.state.songQueue.concat(event.songs).reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], []);;
+        this.state.songQueue = this.state.songQueue
+            .concat(event.songs)
+            .reduce((acc, curr) => acc.find(item => item.id === curr.id) ? acc : [...acc, curr], [])
         // this.state.shuffledIndices = this.state.shuffledIndices.concat(Array.from({length: event.songs.length}).map((val, ii) => ii).shuffle())
     }
 

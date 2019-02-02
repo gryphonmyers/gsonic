@@ -20,6 +20,7 @@ module.exports = Component => class PlayerComponent extends Component {
             },
             volume: 1,
             isShuffled: false,
+            numSongsToPreload: 2,
             showSongQueue: false,
             playbackStartIndex: 0,
             castPlayerActive: false,
@@ -52,8 +53,30 @@ module.exports = Component => class PlayerComponent extends Component {
         }, super.state);
     }
 
+    static get deserializers() {
+        return {
+            playingSong: function(val) {
+                return val && this.libraryInterface ? this.libraryInterface.deserialize(val) : null;
+            },
+            nextSongs: function(val) {
+                return val && val.length && this.libraryInterface ? val.map(song => this.libraryInterface.deserialize(song)) : null;
+            }
+        }
+    }
+
+    static get serializers() {
+        return {
+            playingSong: function(val) {
+                return val ? val.serialize() : null;
+            },
+            nextSongs: function(val) {
+                return val && val.length ? val.map(song => song.serialize()) : [];
+            }
+        }
+    }
+
     static get inputs() {
-        return ['songQueue', 'isPlaying', 'playbackStartIndex', 'isShuffled'];
+        return ['songQueue', 'isPlaying', 'playbackStartIndex', 'isShuffled', 'libraryInterface'];
     }
 
     static get markup(){
@@ -95,7 +118,6 @@ module.exports = Component => class PlayerComponent extends Component {
     onInit() {
         this.state.watch('playingSong', playingSong => {
             if (playingSong) {
-                // debugger;
                 // this.state.currentTime = 0;
             } else {
                 this.state.currentTime = null;

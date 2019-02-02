@@ -8,7 +8,8 @@ function makeBundler(input, output) {
     var b = browserify({
         cache: {},
         packageCache: {},
-        plugin: ['watchify']
+        plugin: ['watchify'],
+        standalone: 'gsonicApp'
     });
     b.on('update', bundle);
     b.on('log', console.log);
@@ -23,7 +24,7 @@ function makeBundler(input, output) {
         b.transform('babelify', {presets: ['es2015']});
     }
     b.transform('pugvdomify');
-    b.transform('browserify-postcss', {plugins: ['postcss-cssnext']});
+    b.transform('browserify-postcss', {plugin: ['postcss-cssnext']});
 
     function bundle() {
         return b.bundle()
