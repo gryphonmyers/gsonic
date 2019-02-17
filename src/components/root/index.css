@@ -2,7 +2,16 @@
     padding-bottom: 100px;
     background-color: #fafafa;
     min-height: 100vh;
+
+    & .lazy-img {
+        
+        &.errored {
+            background-image: linear-gradient(to bottom, #37b8cc 75%, #fff 75%, #dedede);
+        }
+    }
 }
+
+
 
 * {
     box-sizing: border-box;

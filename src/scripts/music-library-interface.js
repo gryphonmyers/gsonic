@@ -34,7 +34,9 @@ class MusicLibraryInterface {
         return {
             ALBUM_SORTBY_NAME: true,
             ALBUM_SORTBY_ADDED: true,
+            ALBUM_SORTBY_ARTIST: true,
             ALBUM_SORTBY_RANDOM: true,
+            ALBUM_SORTBY_RELEASED: true,
             ALBUM_SORT_DIRECTION: true
         }
     }

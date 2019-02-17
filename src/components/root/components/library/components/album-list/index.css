@@ -30,6 +30,7 @@
         & .album-thumb {
             /* margin-bottom: 20px; */
             width: 100%;
+            height: auto;
         }
     
         & .album-details {

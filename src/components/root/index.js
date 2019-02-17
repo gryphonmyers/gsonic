@@ -1,8 +1,10 @@
-var SubsonicMusicLibraryInterface = require('../../scripts/subsonic-interface');
 const defaults = require('defaults-es6');
 
 module.exports = Component => class RootComponent extends Component {
-
+    static get SubsonicMusicLibraryInterface() {
+        return require('../../scripts/subsonic-interface');
+    }
+    
     static get state() {
         return defaults({
             libraryInterface: null,
@@ -20,7 +22,7 @@ module.exports = Component => class RootComponent extends Component {
 
     static get components() {
         return {
-            library: [require('./components/library'), {libraryInterface: 'libraryInterface'}],
+            library: require('./components/library'),
             authform: require('./components/auth-form'),
             player: require('./components/player')
         }
@@ -49,6 +51,7 @@ module.exports = Component => class RootComponent extends Component {
     }
 
     static get deserializers() {
+        var constructor = this;
         return {
             playingSong: function(val) {
                 return val && this.libraryInterface ? this.libraryInterface.deserialize(val) : null;
@@ -57,7 +60,7 @@ module.exports = Component => class RootComponent extends Component {
                 if (libraryInterface) {
                     switch (libraryInterface.constructorName) {
                         case 'SubsonicInterface':
-                            return new SubsonicMusicLibraryInterface(libraryInterface);
+                            return new constructor.SubsonicMusicLibraryInterface(libraryInterface);
                     }
                 }
                 return libraryInterface;                

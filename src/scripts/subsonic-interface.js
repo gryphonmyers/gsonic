@@ -10,6 +10,17 @@ class SubsonicInterface extends MusicLibraryInterface {
         return 'rest/';
     }
 
+    static get featureSupport() {
+        return {
+            ALBUM_SORTBY_NAME: true,
+            ALBUM_SORTBY_ADDED: true,
+            ALBUM_SORTBY_RANDOM: true,
+            ALBUM_SORTBY_ARTIST: true,
+            ALBUM_SORTBY_RELEASED: true,
+            ALBUM_SORT_DIRECTION: false
+        }
+    }
+
     static get ping() {
         return 
     }
@@ -97,14 +108,6 @@ class SubsonicInterface extends MusicLibraryInterface {
             username: this.username,
             password: this.password
         }, super.serialize());
-    }
-
-    getRandomAlbums(params={}) {
-        params = defaults({
-            type: 'random'
-        }, params);
-        return this.request('getAlbumList.view', params)
-            .then(data => data.albumList.album.map(album => this.makeNewAlbum(Object.assign({ artistId: album.parent }, album))))
     }
 
     async getArtists(params={}) {
@@ -267,14 +270,18 @@ class SubsonicInterface extends MusicLibraryInterface {
 
     getAlbums(params) { 
         if (params.sort) {
-            if (params.sort.name) {
-
-            }
             if (params.sort.added) {
-                return this.request('getAlbumList.view', { type: 'recent', offset: params.skip })
-                    .then(data => data.albumList.album.map(album => this.makeNewAlbum(Object.assign({ artistId: album.parent }, album))))
-                
+                var request = this.request('getAlbumList.view', { type: 'newest', offset: params.skip, size: params.limit })
+            } else if (params.sort.released) {
+                request = this.request('getAlbumList.view', { type: 'recent', offset: params.skip, size: params.limit })
+            } else if (params.sort.name) {
+                request = this.request('getAlbumList.view', { type: 'alphabeticalByName', offset: params.skip, size: params.limit })
+            } else if (params.sort.random) {
+                request = this.request('getAlbumList.view', { type: 'random', offset: params.skip, size: params.limit })
+            } else if (params.sort.artist) {
+                request = this.request('getAlbumList.view', { type: 'alphabeticalByArtist', offset: params.skip, size: params.limit })
             }
+            return request.then(data => data.albumList.album.map(album => this.makeNewAlbum(Object.assign({ artistId: album.parent }, album))))
         }
     }
 

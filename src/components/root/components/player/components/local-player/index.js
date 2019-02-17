@@ -12,6 +12,7 @@ module.exports = Component => class LocalPlayerComponent extends Component {
 
     static get state() {
         return defaults({
+            numSongsToPreload: 2,
             isBuffering: false,
             playerID: function(){
                 return 'player-' + this.$id;
@@ -54,6 +55,7 @@ module.exports = Component => class LocalPlayerComponent extends Component {
 
     onCanPlayThrough(evt) {
         this.state.isBuffering = false;
+        this.trigger('oncanplaythrough', evt);
         evt.target.play();
     }
 
@@ -116,16 +118,19 @@ module.exports = Component => class LocalPlayerComponent extends Component {
 
         this.state.watch('nextSongs', nextSongs => {
             if (nextSongs && nextSongs.length) {
-                nextSongs.slice(0, this.state.numSongsToPreload)
-                    .forEach(song => {
-                        var source = getSources(song)[0];
-                        fetch(source.src, {
-                            headers: {
-                                'content-type': source.type,
-                                'range': "bytes=0-"
-                            }
+                if (this.cancelPreload) this.cancelPreload();
+                this.cancelPreload = this.once('oncanplaythrough', () => {
+                    nextSongs.slice(0, this.state.numSongsToPreload)
+                        .forEach(song => {
+                            var source = getSources(song)[0];
+                            fetch(source.src, {
+                                headers: {
+                                    'content-type': source.type,
+                                    'range': "bytes=0-"
+                                }
+                            })
                         })
-                    })
+                })
             }
         })
     }

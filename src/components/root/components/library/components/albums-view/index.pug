@@ -1,6 +1,11 @@
 .albums-view
-    .albums    
-        if isLoading
-            loading-spinner
-        else
-            album-list(albums=albums)
+    nav
+        .sort
+            label(for="albums-sort") Sort By:
+            select.sort-select(id="albums-sort", onchange=$bindValue("sortType"))
+                each sortTypeOption in sortTypeOptions
+                    option(value=sortTypeOption, selected=(sortTypeOption === sortType || undefined))= sortTypeOption
+    .albums
+        album-list(albums=albums)
+    if isLoading
+        loading-spinner

@@ -2,5 +2,12 @@
 .albums-view {
     padding: 20px 20px 50px;
 
-    
+    & .sort-select {
+        margin-bottom: 20px;
+    }
+
+    & .sort-select {
+        margin-left: 10px;
+        text-transform: uppercase;
+    }
 }

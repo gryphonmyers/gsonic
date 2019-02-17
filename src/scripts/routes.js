@@ -10,7 +10,10 @@ module.exports = [
             {
                 name: 'albums',
                 pattern: 'albums/',
-                handler: () => {
+                handler: evt => {
+                    if (!evt.hash) {
+                        return Promise.reject({ name: 'albums', hash: 'added' });
+                    }
                     return 'albums-view';
                 }
             },

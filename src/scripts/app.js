@@ -5,6 +5,6 @@ var app = new App({
     el: '#app',
     Component: require('../components/root'),
     renderInterval: 16.667
-})
+});
 
 module.exports = app;

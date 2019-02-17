@@ -1,7 +1,8 @@
 .album-list
     each album in albums
         .album
-            img.album-thumb(src=album.coverThumb)
+            a(href=$routerLink({ name: 'album', hash: album.id }))
+                lazy-img.album-thumb(src=album.coverThumb, width=300, height=300)
             .album-details
                 a.album-title(href=$routerLink({ name: 'album', hash: album.id }))= album.title
                 a.album-artist(href=$routerLink({ name: 'artist', hash: album.artistId }))= album.artist

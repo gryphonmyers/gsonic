@@ -9,6 +9,12 @@ module.exports = Component => class AlbumListComponent extends Component {
         }, super.state);
     }
 
+    static get components() {
+        return {
+            'lazy-img': require('weddell-lazy-image-component')
+        }
+    }
+
     static get inputs() {
         return ['albums'];
     }
