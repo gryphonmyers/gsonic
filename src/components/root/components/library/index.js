@@ -6,7 +6,26 @@ module.exports = Component => class LibraryComponent extends Component {
         return defaults({
             searchResults: null,
             playingSong: null,
-            showSearchResults: false
+            showSearchResults: false,
+            miniSearchResults: function() {
+                if (this.searchResults) {
+                    var results = {};
+                    if (this.searchResults.songs) {
+                        results.songs = this.searchResults.songs.slice(0, 3);
+                    }
+                    if (this.searchResults.albums) {
+                        results.albums = this.searchResults.albums.slice(0, 3);
+                    }
+                    if (this.searchResults.artists) {
+                        results.artists = this.searchResults.artists.slice(0, 3);
+                    }
+                    return results;
+                }
+                return null;
+            },
+            isSearchView: function() {
+                return this.$currentRouteName === 'searchResults';
+            }
         }, super.state);
     }
 
@@ -22,20 +41,32 @@ module.exports = Component => class LibraryComponent extends Component {
         return ['libraryInterface', 'playingSong'];
     }
 
-    static get hydrators() {
+    static get deserializers() {
+        var searchResults = function(searchResults) {
+            return this.libraryInterface && searchResults ? 
+                searchResults.reduce((acc, curr) => Object.assign(acc, {[curr[0]]: curr[1] ? curr[1].map(item => this.libraryInterface.deserialize(item)) : null }), {}) : null;
+        };
         return {
-            searchResults: function(searchResults) {
-                return this.libraryInterface && searchResults ? 
-                    searchResults.reduce((acc, curr) => Object.assign(acc, {[curr[0]]: curr[1] ? curr[1].map(item => this.libraryInterface.deserialize(item)) : null }), {}) : null;
-            }
+            searchResults,
+            miniSearchResults: searchResults
+        }
+    }
+
+    static get serializers() {
+        var searchResults = function(searchResults) {
+            return searchResults ? Object.entries(searchResults).map(result => [result[0], result[1] ? result[1].map(item => item.serialize()) : null]) : null;
+        };
+        return {
+            searchResults,
+            miniSearchResults: searchResults
         }
     }
 
     search(query='') {
         if (query) {
-            this.state.libraryInterface.search({ query, limit: 3 })
+            this.state.libraryInterface.search({ query })
                 .then(searchResults => {
-                    this.state.searchResults = Object.entries(searchResults).map(result => [result[0], result[1] ? result[1].map(item => item.serialize()) : null]);
+                    this.state.searchResults = searchResults;
                 });
         } else {
             this.state.searchResults = null;
@@ -73,6 +104,7 @@ module.exports = Component => class LibraryComponent extends Component {
             'artist-view': require('./components/artist-view'),
             'album-view': require('./components/album-view'),
             'artists-view': require('./components/artists-view'),
+            'search-results-view': require('./components/search-results'),
             materialtextfield: require('../../../material-text-field'),
             'loading-spinner': require('./components/loading-spinner')
         };

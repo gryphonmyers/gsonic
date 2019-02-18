@@ -18,7 +18,7 @@
     "postcss": "^6.0.13",
     "postcss-cssnext": "^2.11.0",
     "small-supplant": "0.0.4",
-    "weddell": "^3.1.0-27",
+    "weddell": "^3.1.0-28",
     "weddell-lazy-image-component": "^1.1.0",
     "xml2js": "^0.4.19"
   },

@@ -1,0 +1,20 @@
+.search-results-view
+    if searchResultsEmpty
+        section
+            span No search results found.
+    else
+        if searchResults.songs
+            section
+                h1 Songs            
+                song-list(songs = searchResults.songs)
+        if searchResults.albums
+            section
+                h1 Albums
+                album-list(albums = searchResults.albums)
+        if searchResults.artists
+            section
+                h1 Artists
+                artist-list(artists = searchResults.artists)
+
+        
+

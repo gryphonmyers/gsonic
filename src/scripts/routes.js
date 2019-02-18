@@ -40,7 +40,7 @@ module.exports = [
             {
                 name: 'searchResults',
                 pattern: 'search/',
-                handler: 'search-results'
+                handler: 'search-results-view'
             },
             {
                 name: 'rootRedirect',
