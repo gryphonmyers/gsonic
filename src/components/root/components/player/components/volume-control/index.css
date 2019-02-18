@@ -1,0 +1,58 @@
+:root {
+    --active-color: #ff5722;
+}
+
+.volume-control-component {
+    &:hover {
+        & .slider {
+            opacity: 1;
+            visibility: visible;
+            transition: 0.25s opacity;
+        }
+        & .current-volume-state {
+            opacity: 0;
+        }
+    }
+
+    & .current-volume-state {
+        transition: 0.25s opacity;
+        opacity: 1;
+    }
+
+    width: 30px;
+    height: 30px;
+
+    position: relative;
+
+    & .slider {
+        background-color: white;
+        padding: 5px 4px;
+        border-radius: 15%;
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.25s opacity, 0s 0.25s visibility;
+        user-select: none;
+        cursor: pointer;
+        z-index: 2;
+        position: absolute;
+        bottom: 0;
+        height: 150px;
+        left: 50%;
+        transform: translateX(-50%);
+        /* background-image: linear-gradient(to top, white, ); */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        & .control {
+            width: 30px;
+            height: 30px;
+        }
+    }
+
+    & .bar {
+        padding: 0 calc(50% - 2px);
+        background-clip: content-box;
+        flex-basis: 100%;
+    }
+}

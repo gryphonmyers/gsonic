@@ -9,12 +9,12 @@
 .player-component {
     display: grid;
     
-    grid-template-columns: 100fr auto 50fr 45px auto;
+    grid-template-columns: 100fr auto 50fr auto 45px auto;
     @media (--l-viewport-up) {
-        grid-template-columns: 100fr auto 80fr 45px auto;
+        grid-template-columns: 100fr auto 80fr auto 45px auto;
     }
     grid-template-rows: 4px auto;
-    grid-template-areas: ". . . . ." "left-area . . cast-area music-queue-area";
+    grid-template-areas: ". . . . . ." "left-area . . volume-area cast-area music-queue-area";
     align-items: center;
     justify-content: space-between;
     position: fixed;
@@ -113,6 +113,10 @@
         }
         & .now-playing-album {
         }
+    }
+
+    & > .volume-control-component {
+      grid-area: volume-area;   
     }
 
     & .cast-player {

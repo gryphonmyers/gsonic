@@ -1,0 +1,18 @@
+.volume-control-component
+    .current-volume-state
+        if volume > 0.75
+            .volume-up.control.material-icons volume_up
+        else if volume == 0
+            .volume-mute.control.material-icons volume_mute
+        else
+            .volume-down.control.material-icons volume_down
+    .slider
+        .volume-up.control.material-icons(title="Volume Up", onclick=$bind("this.trigger('volumecontrolchange', {newVolume:1})")) volume_up
+        .bar(
+            style="background-image: linear-gradient(to top, #ff5722, #ff5722 " + volumePercent + ", white " + volumePercent + ", white);",
+            onmousemove=$bind("this.onMouseMove(event)"),
+            onmousedown=$bind("this.onMouseDown(event)"),
+            onmouseleave=$bind("this.onMouseLeave(event)"),
+            onmouseup=$bind("this.onMouseUp(event)")
+        )
+        .volume-down.control.material-icons(title="Volume Down", onclick=$bind("this.trigger('volumecontrolchange', {newVolume:0})")) volume_down

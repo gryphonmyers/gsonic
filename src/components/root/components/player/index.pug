@@ -29,6 +29,7 @@
         onpauseplayback = $bind("this.trigger('pauseplayback', event)"),
         onskipsong = $bind("this.trigger('skipsong', event)")
     )
+    volume-control(volume=volume, onvolumecontrolchange=$bind("this.onUpdateVolume(event)"))
     if isChrome
         cast-player(
             isPlaying = isPlaying && castPlayerActive, 

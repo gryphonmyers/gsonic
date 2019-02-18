@@ -91,7 +91,8 @@ module.exports = Component => class PlayerComponent extends Component {
         return {
             'local-player': require('./components/local-player'),
             'cast-player': require('./components/cast-player'),
-            'song-list': require('../library/components/song-list')
+            'song-list': require('../library/components/song-list'),
+            'volume-control': require('./components/volume-control')
         };
     }
     
